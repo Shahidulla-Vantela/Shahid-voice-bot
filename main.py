@@ -213,6 +213,7 @@ async def voice_endpoint(websocket: WebSocket):
         await websocket.send_json({"type": "error", "message": str(e)})
 
 @app.get("/health")
+@app.head("/health")
 async def health():
     return {"status": "healthy"}
 
