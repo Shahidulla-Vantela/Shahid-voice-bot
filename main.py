@@ -216,6 +216,16 @@ async def voice_endpoint(websocket: WebSocket):
 async def health():
     return {"status": "healthy"}
 
+@app.get("/debug-env")
+async def debug_env():
+    """Debug endpoint to check environment variables"""
+    elevenlabs_key = os.getenv("ELEVENLABS_API_KEY", "NOT_SET")
+    return {
+        "elevenlabs_key_set": elevenlabs_key != "NOT_SET",
+        "elevenlabs_key_length": len(elevenlabs_key) if elevenlabs_key != "NOT_SET" else 0,
+        "elevenlabs_key_preview": f"{elevenlabs_key[:4]}...{elevenlabs_key[-4:]}" if len(elevenlabs_key) > 8 else "INVALID"
+    }
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
