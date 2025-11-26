@@ -5,6 +5,7 @@ import httpx
 import PyPDF2
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
+from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from groq import Groq
 from deepgram import DeepgramClient, PrerecordedOptions
@@ -12,6 +13,15 @@ from deepgram import DeepgramClient, PrerecordedOptions
 load_dotenv()
 
 app = FastAPI(title="AI Voice Assistant")
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # ============== KNOWLEDGE BASE ==============
 class KnowledgeBase:
@@ -134,7 +144,8 @@ async def text_to_speech_stream(text: str):
         async with httpx.AsyncClient(timeout=30.0) as client:
             async with client.stream("POST", url, json=payload, headers=headers) as response:
                 if response.status_code != 200:
-                    print(f"TTS Error: {response.status_code}")
+                    error_text = await response.aread()
+                    print(f"TTS Error: {response.status_code} - {error_text.decode()}")
                     return
                 async for chunk in response.aiter_bytes(chunk_size=1024):
                     if chunk:
