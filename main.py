@@ -131,6 +131,9 @@ async def text_to_speech_stream(text: str):
     if not api_key:
         print("ElevenLabs API key not configured")
         return
+    
+    # Debug: Check if key is loaded (show first/last 4 chars only)
+    print(f"Using ElevenLabs key: {api_key[:4]}...{api_key[-4:] if len(api_key) > 8 else 'SHORT'}")
 
     url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/stream"
     headers = {"Accept": "audio/mpeg", "Content-Type": "application/json", "xi-api-key": api_key}
